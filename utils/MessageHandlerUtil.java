@@ -123,7 +123,7 @@ public class MessageHandlerUtil {
                 break;
             case "图片":
                 //通过素材管理接口上传图片时得到的media_id
-                String imgMediaId = "dSQCiEHYB-pgi7ib5KpeoFlqpg09J31H28rex6xKgwWrln3HY0BTsoxnRV-xC_SQ";
+                String imgMediaId = "6Z6_2lZZdQtdF8IqCw9VFCZOV_I-WCdUCKG98pixdqas2ORFoYPUP0bR5B9VBWNk";
                 responseMessage = buildImageMessage(map, imgMediaId);
                 break;
             case "语音":
@@ -196,7 +196,7 @@ public class MessageHandlerUtil {
                                 "<Content><![CDATA[%s]]></Content>" +
                                 "</xml>",
                         fromUserName, toUserName, getMessageCreateTime(),
-                        "感谢您关注我的个人公众号，请回复如下关键词来使用公众号提供的服务：\n1.文本\n2.图片\n3.语音\n4.视频\n5.音乐\n6.图文");
+                        "感谢您关注我的个人公众号，请回复如下关键词来使用公众号提供的服务：我是傻秀秀");
         return responseMessageXml;
     }
 
@@ -457,6 +457,7 @@ public class MessageHandlerUtil {
         String mediaId = map.get("MediaId");
         System.out.print("picUrl:" + picUrl);
         System.out.print("mediaId:" + mediaId);
+        buildImageMessage(map,mediaId);
         String result = String.format("已收到您发来的图片，图片Url为：%s\n图片素材Id为：%s", picUrl, mediaId);
         return buildTextMessage(map, result);
     }
