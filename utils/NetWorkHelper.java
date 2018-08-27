@@ -4,6 +4,8 @@ import javax.net.ssl.*;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -59,6 +61,72 @@ public class NetWorkHelper {
         }
         return resultData;
     }
+
+    /**
+
+     * 连接请求微信后台接口
+
+     * @param action 接口url
+
+     * @param json  请求接口传送的json字符串
+
+     */
+
+    public  void connectWeiXinInterface(String action,String json){
+
+        URL url;
+
+        try {
+
+            url = new URL(action);
+
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+
+            http.setRequestMethod("POST");
+
+            http.setRequestProperty("Content-Type",
+
+                    "application/x-www-form-urlencoded");
+
+            http.setDoOutput(true);
+
+            http.setDoInput(true);
+
+            System.setProperty("sun.net.client.defaultConnectTimeout", "30000");// 连接超时30秒
+
+            System.setProperty("sun.net.client.defaultReadTimeout", "30000"); // 读取超时30秒
+
+            http.connect();
+
+            OutputStream os = http.getOutputStream();
+
+            os.write(json.getBytes("UTF-8"));// 传入参数
+
+            InputStream is = http.getInputStream();
+
+            int size = is.available();
+
+            byte[] jsonBytes = new byte[size];
+
+            is.read(jsonBytes);
+
+            String result = new String(jsonBytes, "UTF-8");
+
+            System.out.println("请求返回结果:"+result);
+
+            os.flush();
+
+            os.close();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+
+    }
+
+
 
     X509TrustManager xtm = new X509TrustManager() {
         @Override

@@ -31,6 +31,9 @@ public class WeChatApiUtil {
     // 素材上传(POST)https://api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
     private static final String UPLOAD_MEDIA = "https://api.weixin.qq.com/cgi-bin/media/upload";
 
+    //上传图文页
+    private static final String UPLOAD_IMAGE = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=%s";
+
     // 素材下载:不支持视频文件的下载(GET)
     private static final String DOWNLOAD_MEDIA = "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token=%s&media_id=%s";
 
@@ -66,6 +69,58 @@ public class WeChatApiUtil {
             }
         }
         return token;
+    }
+
+    /**
+     * 上传图文页
+     * @param file
+     * @param token
+     * @param type
+     * @return
+     */
+    public static JSONObject uploadIMage(File file, String token, String type) {
+        if (file == null || token == null || type == null) {
+            return null;
+        }
+
+        if (!file.exists()) {
+            System.out.println("上传文件不存在,请检查!");
+            return null;
+        }
+
+        String url = String.format(UPLOAD_IMAGE,token);
+        JSONObject jsonObject = null;
+        PostMethod post = new PostMethod(url);
+        post.setRequestHeader("Connection", "Keep-Alive");
+        post.setRequestHeader("Cache-Control", "no-cache");
+        FilePart media;
+        HttpClient httpClient = new HttpClient();
+        //信任任何类型的证书
+        Protocol myhttps = new Protocol("https", new SSLProtocolSocketFactory(), 443);
+        Protocol.registerProtocol("https", myhttps);
+
+        try {
+            media = new FilePart("media", file);
+            Part[] parts = new Part[]{new StringPart("access_token", token),
+                    new StringPart("type", type), media};
+            MultipartRequestEntity entity = new MultipartRequestEntity(parts,
+                    post.getParams());
+            post.setRequestEntity(entity);
+            int status = httpClient.executeMethod(post);
+            if (status == HttpStatus.SC_OK) {
+                String text = post.getResponseBodyAsString();
+                jsonObject = JSONObject.parseObject(text);
+            } else {
+                System.out.println("upload Media failure status is:" + status);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (HttpException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 
     /**
@@ -119,7 +174,6 @@ public class WeChatApiUtil {
         }
         return jsonObject;
     }
-
     /**
      * 多媒体下载接口
      *
@@ -227,6 +281,8 @@ public class WeChatApiUtil {
         String appSecret = "d9fa2b5707d343522dbd6e53841cbcd8";
         String token = WeChatApiUtil.getToken(appId, appSecret);
         JSONObject jsonObject = uploadMedia(f, token, type);
+        JSONObject sd = uploadIMage(f,token,type);
+        System.out.println(sd);
         return jsonObject;
     }
 
@@ -298,21 +354,22 @@ public class WeChatApiUtil {
     public static void main(String[] args) throws Exception{
         //媒体文件路径
         String filePath = "D:/workspace/idea/hsjyhsdn/wxdemo/src/main/resources/media/image/map.png";
-        //String filePath = "D:/JavaSoftwareDevelopeFolder/IntelliJ IDEA_Workspace/WxStudy/web/media/voice/voice.mp3";
-        //String filePath = "D:\\JavaSoftwareDevelopeFolder\\IntelliJ IDEA_Workspace\\WxStudy\\web\\media\\video\\小苹果.mp4";
+       // String filePath = "D:/workspace/idea/hsjyhsdn/wxdemo/src/main/resources/media/voice/voice.mp3";
+      // String filePath = "D:/workspace/idea/hsjyhsdn/wxdemo/src/main/resources/media/video/小苹果.mp4";
         //媒体文件类型
         String type = "image";
         //String type = "voice";
-        //String type = "video";
-        JSONObject uploadResult = uploadMedia(filePath, type);
+       // String type = "video";
+        //JSONObject uploadResult = uploadMedia(filePath, type);
+        JSONObject g = uploadMedia(filePath, type);
         //{"media_id":"dSQCiEHYB-pgi7ib5KpeoFlqpg09J31H28rex6xKgwWrln3HY0BTsoxnRV-xC_SQ","created_at":1455520569,"type":"image"}
-        System.out.println(uploadResult.toString());
+/*        System.out.println(uploadResult.toString());
 
         //下载刚刚上传的图片以id命名
-        String media_id = uploadResult.getString("media_id");
-        File file = downloadMedia("D:/" + media_id + ".png", media_id);
-        System.out.println(file.getName());
-
+        String media_id = uploadResult.getString("media_id");*/
+    /*    File file = downloadMedia("D:/" + media_id + ".png", media_id);
+        System.out.println(file.getName());*/
+       // System.out.println(media_id);
     }
 }
 

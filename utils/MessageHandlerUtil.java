@@ -144,7 +144,7 @@ public class MessageHandlerUtil {
                 break;
             case "视频":
                 Video video = new Video();
-                video.mediaId = "GqmIGpLu41rtwaY7WCVtJAL3ZbslzKiuLEXfWIKYDnHXGObH1CBH71xtgrGwyCa3";
+                video.mediaId = "XpdxY3oyxJVSNJ3AGnUS0PWr4hZBSjNGKC1NcMUhoh8ouNbCtbmYn2RhqTcguiXL";
                 video.title = "小苹果";
                 video.description = "小苹果搞笑视频";
                 responseMessage = buildVideoMessage(map, video);
@@ -196,7 +196,7 @@ public class MessageHandlerUtil {
                                 "<Content><![CDATA[%s]]></Content>" +
                                 "</xml>",
                         fromUserName, toUserName, getMessageCreateTime(),
-                        "感谢您关注我的个人公众号，请回复如下关键词来使用公众号提供的服务：我是傻秀秀");
+                        "感谢您关注我的个人公众号，请回复如下关键词来使用公众号提供的服务：我是秀秀");
         return responseMessageXml;
     }
 
@@ -206,7 +206,7 @@ public class MessageHandlerUtil {
      * @param content 文本消息内容
      * @return 文本消息XML字符串
      */
-    private static String buildTextMessage(Map<String, String> map, String content) {
+    public static String buildTextMessage(Map<String, String> map, String content) {
         //发送方帐号
         String fromUserName = map.get("FromUserName");
         // 开发者微信号
@@ -404,14 +404,14 @@ public class MessageHandlerUtil {
                 "　　1、要有一个用来测试的公众号。\n" +
                 "\n" +
                 "　　2、用来调式代码的开发环境";
-        item.PicUrl = "http://images2015.cnblogs.com/blog/289233/201601/289233-20160121164317343-2145023644.png";
+        item.PicUrl = "http://pic153.nipic.com/file/20180117/26360097_152544240000_2.jpg";
         item.Url = "http://www.cnblogs.com/xdp-gacl/p/5149171.html";
         String itemContent1 = buildSingleItem(item);
 
         NewsItem item2 = new NewsItem();
         item2.Title = "微信开发学习总结（二）——微信开发入门";
         item2.Description = "微信服务器就相当于一个转发服务器，终端（手机、Pad等）发起请求至微信服务器，微信服务器然后将请求转发给我们的应用服务器。应用服务器处理完毕后，将响应数据回发给微信服务器，微信服务器再将具体响应信息回复到微信App终端。";
-        item2.PicUrl = "";
+        item2.PicUrl = "http://pic153.nipic.com/file/20180117/26360097_152544240000_2.jpg";
         item2.Url = "http://www.cnblogs.com/xdp-gacl/p/5151857.html";
         String itemContent2 = buildSingleItem(item2);
 

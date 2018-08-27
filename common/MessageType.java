@@ -1,5 +1,7 @@
 package com.wx.ioc.wxdemo.common;
 
+import com.wx.ioc.wxdemo.controller.Test;
+
 /**
  * 接收到的消息类型
  * @author HSHY-394
@@ -12,5 +14,6 @@ public enum MessageType {
     SHORTVIDEO,//小视频消息
     LOCATION,//地理位置消息
     LINK,//链接消息
-    EVENT//事件消息
+    EVENT,//事件消息
+    TEST
 }
