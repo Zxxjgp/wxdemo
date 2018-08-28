@@ -5,6 +5,7 @@ import com.wx.ioc.wxdemo.entity.AccessToken;
 import com.wx.ioc.wxdemo.service.AccessTokens;
 import com.wx.ioc.wxdemo.utils.MessageHandlerUtil;
 import com.wx.ioc.wxdemo.utils.NetWorkHelper;
+import org.hibernate.validator.constraints.pl.REGON;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -364,7 +366,7 @@ public class Test {
      */
     @RequestMapping(value = "huoquCode", method = RequestMethod.GET)
     public  void huoquCode(){
-        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxb97266dfb271f554&secret=d9fa2b5707d343522dbd6e53841cbcd8&code=071V04Yh22cGLH0zF0Zh2Vc4Yh2V04Ys&grant_type=authorization_code";
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxb97266dfb271f554&secret=d9fa2b5707d343522dbd6e53841cbcd8&code=0818DbAa2C4s9P0hPsza2jhtAa28DbAL&grant_type=authorization_code";
         NetWorkHelper netWorkHelper = new NetWorkHelper();
         String post = netWorkHelper.getHttpsResponse(url, "GET");
         System.out.println(post);
@@ -374,9 +376,210 @@ public class Test {
      */
     @RequestMapping(value = "getUserInfo", method = RequestMethod.GET)
     public void getUserInfo(){
-        String url = "https://api.weixin.qq.com/sns/userinfo?access_token=13_btqlaizJxNRYsLYndwQxdqOEArWgpOGN988gHMi2mzrwR7UpfqoG5La8Bhen_iJVAh-5PQOXnTjNMpAhQGLqWvnZ6n8QP5gyCQL3o0w4_g4&openid=oeMVT0c8Lp01LFBMcBof9T62bAt4&lang=zh_CN";
+        String url = "https://api.weixin.qq.com/sns/userinfo?access_token=13_juo20hZjcvkPh5iPHAVHQ6YvwxYWp_wZ3sGH4KBGwf0hwpOPlmm0APM8VCEYZoBt0jkcfa5tAc7F05WR4A9hjA5DNsEijeAXywqr4v64L7s&openid=oeMVT0c8Lp01LFBMcBof9T62bAt4&lang=zh_CN";
         NetWorkHelper netWorkHelper = new NetWorkHelper();
         String post = netWorkHelper.getHttpsResponse(url, "GET");
         System.out.println(post);
     }
+    /**
+     *
+     * 用户标签管理
+     */
+    @RequestMapping(value = "userLableManager", method = RequestMethod.POST)
+    public void userLableManager(){
+        String json = "{   \"tag\" : {     \"name\" : \"广东\",\"count\":5   } }";
+        String token = token();
+        String url = String.format("https://api.weixin.qq.com/cgi-bin/tags/create?access_token=%s",token);
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/tags/get?access_token=%s",token);
+
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url,json);
+
+    }
+    @RequestMapping(value = "getUserLableInfo", method = RequestMethod.GET)
+    private void getLableUserInfo(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/tags/get?access_token=%s",token);
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        String response = netWorkHelper.getHttpsResponse(actionUrl, "GET");
+        System.out.println(response);
+    }
+    /**
+     * 更新标签update删除delete
+     */
+    @RequestMapping(value = "updateUserLableInfo", method = RequestMethod.POST)
+    public void updateUserLableInfo(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/tags/update?access_token=%s",token);
+        String json = "{\"tag\":{\"id\":100,\"name\":\"广东人\"}}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+    }
+    /**
+     * 获取粉丝
+     */
+    @RequestMapping(value = "getInfo", method = RequestMethod.GET)
+    public void getInfo(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/user/tag/get?access_token=%s",token);
+        String json = "{\"tagid\":100,\"next_openid\":\"\"}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+
+    }
+
+    /**
+     * 批量为用户打标签和删除
+     * https://api.weixin.qq.com/cgi-bin/tags/members/batchuntagging?access_token=ACCESS_TOKEN 这个表示批量的取消
+     * 格式都是一样的
+     *
+     * {   "openid_list" : [//粉丝列表
+     * "ocYxcuAEy30bX0NXmGn4ypqx3tI0",
+     * "ocYxcuBt0mRugKZ7tGAHPnUaOW7Y"   ],
+     * "tagid" : 134 }
+     *
+     *
+     */
+    @RequestMapping(value = "setLable", method = RequestMethod.POST)
+    public  void setLable(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/tags/members/batchtagging?access_token=%s",token);
+        String json = "{\"openid_list\":[\"oeMVT0c8Lp01LFBMcBof9T62bAt4\",\"oeMVT0aOF-CzWeCB4aCUIBBb8eyQ\"],\"tagid\":100}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+    }
+    /**
+     * 获取用户身上的标签列表
+     *
+     *
+     * {   "openid" : "ocYxcuBt0mRugKZ7tGAHPnUaOW7Y" }  opendid这个表示用户的唯一标识符
+     *
+     * https://api.weixin.qq.com/cgi-bin/tags/getidlist?access_token=ACCESS_TOKEN
+     */
+    @RequestMapping(value = "getlableinfo", method = RequestMethod.POST)
+    public void getlableinfo(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/tags/getidlist?access_token=%s",token);
+        String json = "{\"openid\":\"oeMVT0c8Lp01LFBMcBof9T62bAt4\"}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+    }
+
+    /**
+     * 设置用户的备注名称
+     */
+
+    @RequestMapping(value = "setUserRemark", method = RequestMethod.POST)
+    public void setUserRemark(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/user/info/updateremark?access_token=%s",token);
+        String json = "{\"openid\":\"oeMVT0c8Lp01LFBMcBof9T62bAt4\",\"remark\":\"pangzi\"}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+    }
+    /**
+     * 单个用户信息的获取
+     *
+     * 接口调用请求说明
+     * http请求方式: GET
+     * https://api.weixin.qq.com/cgi-bin/user/info?access_token=ACCESS_TOKEN&openid=OPENID&lang=zh_CN
+     * 获取用户的基本信息
+     *
+     * 返回参数
+     *
+     *  这里就可以获取到我们上面得到的用户的remark
+     */
+    @RequestMapping(value = "getBaseInfo", method = RequestMethod.GET)
+    public void getBaseInfo(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/user/info?access_token=%s&openid=oeMVT0c8Lp01LFBMcBof9T62bAt4&lang=zh_CN",token);
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        System.out.println(actionUrl);
+        String get = netWorkHelper.getHttpsResponse(actionUrl, "GET");
+        System.out.println(get);
+    }
+    /**
+     * 批量的获取用户信息
+     * http请求方式: POST
+     * https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=ACCESS_TOKEN
+     *
+     * 获取的json包
+     * {
+     *     "user_list": [
+     *         {
+     *             "openid": "otvxTs4dckWG7imySrJd6jSi0CWE",
+     *             "lang": "zh_CN"
+     *         },
+     *         {
+     *             "openid": "otvxTs_JZ6SEiP0imdhpi50fuSZg",
+     *             "lang": "zh_CN"
+     *         }
+     *     ]
+     * }
+     *
+     */
+    @RequestMapping(value = "getBaseInfoList", method = RequestMethod.POST)
+    public void getBaseInfoList(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/user/info/batchget?access_token=%s",token);
+        String json = "{\"user_list\":[{\"openid\":\"oeMVT0c8Lp01LFBMcBof9T62bAt4\",\"lang\":\"zh_CN\"},{\"openid\":\"oeMVT0Ru0PM934dMLjQuUPtH37EQ\",\"lang\":\"zh_CN\"}]}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+    }
+    /**
+     * 获取用户列表
+     * http请求方式: GET（请使用https协议）
+     * https://api.weixin.qq.com/cgi-bin/user/get?access_token=ACCESS_TOKEN&next_openid=NEXT_OPENID
+     *
+     * 参数说明   next_openid	是	第一个拉取的OPENID，不填默认从头开始拉取
+     *
+     *
+     */
+    @RequestMapping(value = "getUserList", method = RequestMethod.GET)
+    public void getUserList(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/user/get?access_token=%s",token);
+        String json = "";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        String get = netWorkHelper.getHttpsResponse(actionUrl, "GET");
+        System.out.println(get);
+    }
+
+    /**
+     * 用户的黑名单处理
+     * 1，获取公众号的黑名单列表
+     *   http请求方式：POST（请使用https协议）
+     *   https://api.weixin.qq.com/cgi-bin/tags/members/getblacklist?access_token=ACCESS_TOKEN
+     *   {"begin_openid":"OPENID1"
+     *    }
+     *
+     *   2,用户的拉黑
+     *   http请求方式：POST（请使用https协议）
+     *   https://api.weixin.qq.com/cgi-bin/tags/members/batchblacklist?access_token=ACCESS_TOKEN
+     *   json格式
+     *   {
+     *  "openid_list":["OPENID1”,” OPENID2”]
+     * }
+     *   3，取消拉黑
+     *   http请求方式：POST（请使用https协议）
+     * https://api.weixin.qq.com/cgi-bin/tags/members/batchunblacklist?access_token=ACCESS_TOKEN
+     *
+     * {
+     *  "openid_list":["OPENID1”,” OPENID2”]
+     * }
+     *
+     *
+     *
+     *
+     */
+    @RequestMapping(value = "laheilist", method = RequestMethod.POST)
+
+    public void laheilist(){
+        String token = token();
+        String actionUrl = String.format("https:/api.weixin.qq.com/cgi-bin/tags/members/getblacklist?access_token=%s",token);
+        String json = "";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.getHttpsResponse(actionUrl,json);
+    }
+
 }
