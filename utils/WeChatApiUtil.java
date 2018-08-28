@@ -360,7 +360,7 @@ public class WeChatApiUtil {
         String type = "image";
         //String type = "voice";
        // String type = "video";
-        //JSONObject uploadResult = uploadMedia(filePath, type);
+       // JSONObject uploadResult = uploadMedia(filePath, type);
         JSONObject g = uploadMedia(filePath, type);
         //{"media_id":"dSQCiEHYB-pgi7ib5KpeoFlqpg09J31H28rex6xKgwWrln3HY0BTsoxnRV-xC_SQ","created_at":1455520569,"type":"image"}
 /*        System.out.println(uploadResult.toString());

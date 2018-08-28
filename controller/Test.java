@@ -282,7 +282,8 @@ public class Test {
         String token = token();
         String url = String.format("https://api.weixin.qq.com/cgi-bin/message/mass/sendall?access_token=%s",token);
         NetWorkHelper netWorkHelper = new NetWorkHelper();
-        String json = "{\"filter\":{\"is_to_all\":false,\"tag_id\":2},\"mpnews\":{\"media_id\":\"BrkWLPodFQHis0HeMhRpJFMU7E7F6cucboP963l3p6D31snAvY7lZQAJB0Ue8G25\"},\"msgtype\":\"mpnews\",\"send_ignore_reprint\":0}";
+        String json = "{\"filter\":{\"is_to_all\":true,\"tag_id\":3},\"text\":{\"content\":\"我是测试啊\"},\"msgtype\":\"text\"}";
+       // String json = "{\"filter\":{\"is_to_all\":true,\"tag_id\":5},\"mpnews\":{\"media_id\":\"DRvUUFbSAOx23VGADGZqMfgjcWmA0O2f1SDwtPxKPSn4EQjSTf_sOMAmwkn_GWHN\"},\"msgtype\":\"mpnews\",\"send_ignore_reprint\":0}";
         netWorkHelper.connectWeiXinInterface(url,json);
     }
 
@@ -342,8 +343,40 @@ public class Test {
         String token = token();
         String url = String.format(" https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=%s",token);
         NetWorkHelper netWorkHelper = new NetWorkHelper();
-        String json = "{\"touser\":\"oeMVT0c8Lp01LFBMcBof9T62bAt4\",\"template_id\":\"p6dNxSlQCg3-rI0pVajl7pr-cPcLe4HWpmwWzDkYFzk\",\"url\":\"http://weixin.qq.com/download\",\"data\":{\"first\":{\"value\":\"恭喜你购买成功！\",\"color\":\"#173177\"},\"keyword1\":{\"value\":\"巧克力\",\"color\":\"#173177\"},\"keyword2\":{\"value\":\"39.8元\",\"color\":\"#173177\"},\"keyword3\":{\"value\":\"2014年9月22日\",\"color\":\"#173177\"},\"remark\":{\"value\":\"欢迎再次购买！\",\"color\":\"#173177\"}}}";
+       // String json = "{\"touser\":\"oeMVT0c8Lp01LFBMcBof9T62bAt4\",\"template_id\":\"p6dNxSlQCg3-rI0pVajl7pr-cPcLe4HWpmwWzDkYFzk\",\"url\":\"http://weixin.qq.com/download\",\"data\":{\"first\":{\"value\":\"恭喜你购买成功！\",\"color\":\"#173177\"},\"keyword1\":{\"value\":\"巧克力\",\"color\":\"#173177\"},\"keyword2\":{\"value\":\"39.8元\",\"color\":\"#173177\"},\"keyword3\":{\"value\":\"2014年9月22日\",\"color\":\"#173177\"},\"remark\":{\"value\":\"欢迎再次购买！\",\"color\":\"#173177\"}}}";
+        String json = "{\"touser\":\"oeMVT0c8Lp01LFBMcBof9T62bAt4\",\"template_id\":\"p6dNxSlQCg3-rI0pVajl7pr-cPcLe4HWpmwWzDkYFzk\",\"url\":\"https://mp.weixin.qq.com/mp/subscribemsg?action=get_confirm&appid=wxb97266dfb271f554&scene=1000&template_id=XlA_F9qdil8GJLLp5wMFfe_-n1KOaJnArdk6ZqaPbCE&redirect_url=http://h8z8qr.natappfree.cc&reserved=test#wechat_redirect\",\"data\":{\"first\":{\"value\":\"恭喜你购买成功！\",\"color\":\"#173177\"},\"orderProductName\":{\"value\":\"巧克力\",\"color\":\"#173177\"},\"orderMoneySum\":{\"value\":\"39.8元\",\"color\":\"#173177\"},\"keyword3\":{\"value\":\"2014年9月22日\",\"color\":\"#173177\"},\"Remark\":{\"value\":\"欢迎再次购买！\",\"color\":\"#173177\"}}}";
         netWorkHelper.connectWeiXinInterface(url,json);
 
+    }
+
+    /**
+     * 一次性订阅消息
+     */
+    @RequestMapping(value = "buyMessae", method = RequestMethod.GET)
+    public void buyMessae(){
+        String url = "https://mp.weixin.qq.com/mp/subscribemsg?action=get_confirm&appid=wxb97266dfb271f554&scene=1000&template_id=XlA_F9qdil8GJLLp5wMFfe_-n1KOaJnArdk6ZqaPbCE&redirect_url=http://h8z8qr.natappfree.cc&reserved=test#wechat_redirect";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        String post = netWorkHelper.getHttpsResponse(url, "GET");
+        System.out.println(post);
+    }
+    /**
+     * 获取code
+     */
+    @RequestMapping(value = "huoquCode", method = RequestMethod.GET)
+    public  void huoquCode(){
+        String url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxb97266dfb271f554&secret=d9fa2b5707d343522dbd6e53841cbcd8&code=071V04Yh22cGLH0zF0Zh2Vc4Yh2V04Ys&grant_type=authorization_code";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        String post = netWorkHelper.getHttpsResponse(url, "GET");
+        System.out.println(post);
+    }
+    /**
+     * 获取用户信息
+     */
+    @RequestMapping(value = "getUserInfo", method = RequestMethod.GET)
+    public void getUserInfo(){
+        String url = "https://api.weixin.qq.com/sns/userinfo?access_token=13_btqlaizJxNRYsLYndwQxdqOEArWgpOGN988gHMi2mzrwR7UpfqoG5La8Bhen_iJVAh-5PQOXnTjNMpAhQGLqWvnZ6n8QP5gyCQL3o0w4_g4&openid=oeMVT0c8Lp01LFBMcBof9T62bAt4&lang=zh_CN";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        String post = netWorkHelper.getHttpsResponse(url, "GET");
+        System.out.println(post);
     }
 }
