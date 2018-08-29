@@ -338,6 +338,7 @@ public class Test {
     }
 
     /**
+     * 发送模板消息
      * 发送魔板消息
      */
     @RequestMapping(value = "fasong", method = RequestMethod.POST)
@@ -576,10 +577,195 @@ public class Test {
 
     public void laheilist(){
         String token = token();
-        String actionUrl = String.format("https:/api.weixin.qq.com/cgi-bin/tags/members/getblacklist?access_token=%s",token);
-        String json = "";
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/tags/members/getblacklist?access_token=%s",token);
+        String json = "{\"begin_openid\":\"\"}";
         NetWorkHelper netWorkHelper = new NetWorkHelper();
-        netWorkHelper.getHttpsResponse(actionUrl,json);
+        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+        //用户的拉黑
+/*        String actionUrl1 = String.format("https://api.weixin.qq.com/cgi-bin/tags/members/batchblacklist?access_token=%s",token);
+        String json1 = "{\"openid_list\":[\"oeMVT0Ru0PM934dMLjQuUPtH37EQ\"]}";
+        netWorkHelper.connectWeiXinInterface(actionUrl1,json1);*/
+
+        //取消用户拉黑
+/*        String actionUrl2 = String.format("https://api.weixin.qq.com/cgi-bin/tags/members/batchunblacklist?access_token=%s",token);
+        String json2 = "{\"openid_list\":[\"oeMVT0Ru0PM934dMLjQuUPtH37EQ\"]}";
+        netWorkHelper.connectWeiXinInterface(actionUrl2,json2);*/
+
+    }
+    /**
+     * 微信用户请求创建二维码
+     * 1 ， 生成临时二维码
+     * http请求方式: POST
+     * URL: https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=TOKEN
+     * POST数据格式：json
+     * POST数据例子：{"expire_seconds": 604800, "action_name": "QR_SCENE", "action_info": {"scene": {"scene_id": 123}}}
+     *
+     * 或者也可以使用以下POST数据创建字符串形式的二维码参数：
+     * {"expire_seconds": 604800, "action_name": "QR_STR_SCENE", "action_info": {"scene": {"scene_str": "test"}}}
+     *
+     * 2，创建永久二维码
+     * http请求方式: POST
+     * URL: https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=TOKEN
+     * POST数据格式：json
+     * POST数据例子：{"action_name": "QR_LIMIT_SCENE", "action_info": {"scene": {"scene_id": 123}}}
+     *
+     * 或者也可以使用以下POST数据创建字符串形式的二维码参数：
+     * {"action_name": "QR_LIMIT_STR_SCENE", "action_info": {"scene": {"scene_str": "test"}}}
+     *
+     *
+     * 过ticket换取二维码 ticket:gQGv8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyNWFYY1JEVTVkamgxRWRxZk5yY28AAgSNX4ZbAwSAOgkA
+     */
+
+    @RequestMapping(value = "qrcode", method = RequestMethod.POST)
+    public void qrcode(){
+        String token = token();
+        String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s",token);
+        String json = "{\"expire_seconds\": 604800, \"action_name\": \"QR_STR_SCENE\", \"action_info\": {\"scene\": {\"scene_str\": \"test\"}}}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+    }
+
+    /**
+     * 换区二维码gQGv8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyNWFYY1JEVTVkamgxRWRxZk5yY28AAgSNX4ZbAwSAOgkA
+     * 这个直接返回一个页面，我们在开发的时候直接用这个连接得到我们自己的二维码
+     *
+     */
+    @RequestMapping(value = "getqrcode", method = RequestMethod.GET)
+    public void getqrcode(){
+        String url = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQGv8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyNWFYY1JEVTVkamgxRWRxZk5yY28AAgSNX4ZbAwSAOgkA";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        String get = netWorkHelper.getHttpsResponse(url, "GET");
+        System.out.println(get);
+    }
+    /**
+     * 长短连接的改变（可以进行很多的连接转换）
+     * http请求方式: POST
+     * https://api.weixin.qq.com/cgi-bin/shorturl?access_token=ACCESS_TOKEN
+     * long_url 这个是我的需要转化的地址，而会在我的返回结果里得到想想要的短连接
+     * 返回结果如下所示：
+     *    请求返回结果:{"errcode":0,"errmsg":"ok","short_url":"https:\/\/w.url.cn\/s\/ABBlyvT"}
+     *
+     */
+    @RequestMapping(value = "longLink", method = RequestMethod.POST)
+    public void longLink(){
+        String token = token();
+        String url = String.format("https://api.weixin.qq.com/cgi-bin/shorturl?access_token=%s",token);
+        String json = "{\"action\":\"long2short\",\"long_url\":\"https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQGv8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyNWFYY1JEVTVkamgxRWRxZk5yY28AAgSNX4ZbAwSAOgkA\"}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url,json);
+    }
+    /**
+     * 微信认证时间的推送
+     * 事件的推送会推送到开发者的服务中心
+     * 这个都会推送到你开的时候填写的url上面，你的的这个url会，干吼需要你去解析得到相对应的结果
+     */
+
+    /**
+     * 用户的数据分析（请求必须是以POST）
+     * 用户分析数据接口
+     * 接口名称	                     最大时间跨度	     接口调用地址（必须使用https）
+     * 获取用户增减数据（getusersummary）	7	         https://api.weixin.qq.com/datacube/getusersummary?access_token=ACCESS_TOKEN
+     * 获取累计用户数据（getusercumulate）	7	         https://api.weixin.qq.com/datacube/getusercumulate?access_token=ACCESS_TOKEN
+     *
+     *
+     *
+     *
+     * 返回参数说明
+     *  ref_date	数据的日期
+     *  user_source	用户的渠道，数值代表的含义如下： 0代表其他合计 1代表公众号搜索 17代表名片分享 30代表扫描二维码 43代表图文页右上角菜单 51代表支付后关注（在支付完成页） 57代表图文页内公众号名称 75代表公众号文章广告 78代表朋友圈广告
+     *  new_user	新增的用户数量
+     *  cancel_user	取消关注的用户数量，new_user减去cancel_user即为净增用户数量
+     *  cumulate_user	总用户量
+     *
+     */
+    @RequestMapping(value = "getUserAnalisis", method = RequestMethod.POST)
+    public void getUserAnalisis(){
+        String token = token();
+        String url1 = String.format("https://api.weixin.qq.com/datacube/getusersummary?access_token=%s",token);
+        String url2 = String.format("https://api.weixin.qq.com/datacube/getusercumulate?access_token=%s",token);
+        String json = "{\"begin_date\":\"2018-08-27\",\"end_date\":\"2018-08-28\"}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url1,json);
+        netWorkHelper.connectWeiXinInterface(url2,json);
+    }
+
+    /**
+     * 图文消息数据接口
+     *  这里只测试一个
+     *
+     *
+     接口名称	                            最大时间跨度	  接口调用地址（必须使用https）
+     获取图文群发每日数据（getarticlesummary）	1          https://api.weixin.qq.com/datacube/getarticlesummary?access_token=ACCESS_TOKEN
+     获取图文群发总数据（getarticletotal）	    1	       https://api.weixin.qq.com/datacube/getarticletotal?access_token=ACCESS_TOKEN
+     获取图文统计数据（getuserread）	        3	       https://api.weixin.qq.com/datacube/getuserread?access_token=ACCESS_TOKEN
+     获取图文统计分时数据（getuserreadhour）	    1          https://api.weixin.qq.com/datacube/getuserreadhour?access_token=ACCESS_TOKEN
+     获取图文分享转发数据（getusershare）	    7	       https://api.weixin.qq.com/datacube/getusershare?access_token=ACCESS_TOKEN
+     获取图文分享转发分时数据（getusersharehour）	1          https://api.weixin.qq.com/datacube/getusersharehour?access_token=ACCESS_TOKEN
+     */
+
+    @RequestMapping(value = "getUserTuwen", method = RequestMethod.POST)
+    public void getUserTuwen(){
+        String token = token();
+        String url1 = String.format("https://api.weixin.qq.com/datacube/getuserread?access_token=%s",token);
+        String url2 = String.format("https://api.weixin.qq.com/datacube/getusershare?access_token=%s",token);
+        String json = "{\"begin_date\":\"2018-08-27\",\"end_date\":\"2018-08-28\"}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url1,json);
+        netWorkHelper.connectWeiXinInterface(url2,json);
+    }
+
+    /**
+     *消息分析数据接口
+     * 测试部分数据
+     *
+     *
+     接口名称	最大时间跨度	接口调用地址（必须使用https）
+     获取消息发送概况数据（getupstreammsg）	7	https://api.weixin.qq.com/datacube/getupstreammsg?access_token=ACCESS_TOKEN
+     获取消息分送分时数据（getupstreammsghour）	1	https://api.weixin.qq.com/datacube/getupstreammsghour?access_token=ACCESS_TOKEN
+     获取消息发送周数据（getupstreammsgweek）	30	https://api.weixin.qq.com/datacube/getupstreammsgweek?access_token=ACCESS_TOKEN
+     获取消息发送月数据（getupstreammsgmonth）	30	https://api.weixin.qq.com/datacube/getupstreammsgmonth?access_token=ACCESS_TOKEN
+     获取消息发送分布数据（getupstreammsgdist）	15	https://api.weixin.qq.com/datacube/getupstreammsgdist?access_token=ACCESS_TOKEN
+     获取消息发送分布周数据（getupstreammsgdistweek）	30	https://api.weixin.qq.com/datacube/getupstreammsgdistweek?access_token=ACCESS_TOKEN
+     获取消息发送分布月数据（getupstreammsgdistmonth）	30	https://api.weixin.qq.com/datacube/getupstreammsgdistmonth?access_token=ACCESS_TOKEN
+     *
+     *
+     */
+    @RequestMapping(value = "getUserText", method = RequestMethod.POST)
+    public void getUserText(){
+        String token = token();
+        String url1 = String.format("https://api.weixin.qq.com/datacube/getupstreammsg?access_token=%s",token);
+        String url2 = String.format("https://api.weixin.qq.com/datacube/getupstreammsgdistweek?access_token=%s",token);
+        String url3 = String.format("https://api.weixin.qq.com/datacube/getupstreammsgweek?access_token=%s",token);
+        String url4 = String.format("https://api.weixin.qq.com/datacube/getupstreammsgdist?access_token=%s",token);
+        String json = "{\"begin_date\":\"2018-08-24\",\"end_date\":\"2018-08-28\"}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url1,json);
+        netWorkHelper.connectWeiXinInterface(url2,json);
+        netWorkHelper.connectWeiXinInterface(url4,json);
+        netWorkHelper.connectWeiXinInterface(url3,json);
+    }
+
+    /**
+     *接口分析数据接口
+     * 测试
+     *
+     *
+     *
+     *
+     接口名称	最大时间跨度	接口调用地址（必须使用https）
+     获取接口分析数据（getinterfacesummary）	30	https://api.weixin.qq.com/datacube/getinterfacesummary?access_token=ACCESS_TOKEN
+     获取接口分析分时数据（getinterfacesummaryhour）	1	https://api.weixin.qq.com/datacube/getinterfacesummaryhour?access_token=ACCESS_TOKEN
+     */
+    @RequestMapping(value = "getWxInterface", method = RequestMethod.POST)
+    public void getWxInterface(){
+        String token = token();
+        String url1 = String.format("https://api.weixin.qq.com/datacube/getinterfacesummary?access_token=%s",token);
+        String url2 = String.format("https://api.weixin.qq.com/datacube/getinterfacesummaryhour?access_token=%s",token);
+        String json = "{\"begin_date\":\"2018-08-24\",\"end_date\":\"2018-08-28\"}";
+        String json2 = "{\"begin_date\":\"2018-08-28\",\"end_date\":\"2018-08-28\"}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url1,json);
+        netWorkHelper.connectWeiXinInterface(url2,json2);
     }
 
 }
