@@ -17,10 +17,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.wx.ioc.wxdemo.utils.MessageHandlerUtil.buildTextMessage;
 
@@ -613,7 +612,7 @@ public class Test {
      * {"action_name": "QR_LIMIT_STR_SCENE", "action_info": {"scene": {"scene_str": "test"}}}
      *
      *
-     * 过ticket换取二维码 ticket:gQGv8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyNWFYY1JEVTVkamgxRWRxZk5yY28AAgSNX4ZbAwSAOgkA
+     * 生成ticket换取二维码 ticket:gQGv8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyNWFYY1JEVTVkamgxRWRxZk5yY28AAgSNX4ZbAwSAOgkA
      */
 
     @RequestMapping(value = "qrcode", method = RequestMethod.POST)
@@ -621,8 +620,11 @@ public class Test {
         String token = token();
         String actionUrl = String.format("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s",token);
         String json = "{\"expire_seconds\": 604800, \"action_name\": \"QR_STR_SCENE\", \"action_info\": {\"scene\": {\"scene_str\": \"test\"}}}";
+        String json2 = "{\"action_name\":\"QR_CARD\",\"action_info\":{\"card\":{\"card_id\":\"peMVT0YHODc5JbTPi-9HPlEHJzPo\"}}}";
+        String json3 = "{\"action_name\":\"QR_CARD\",\"action_info\":{\"card\":{\"card_id\":\"peMVT0SXtzD_MdeHJ72yQ-l8c0v4\"}}}";
+        String json4 = "{\"action_name\":\"QR_CARD\",\"expire_seconds\":1800,\"action_info\":{\"card\":{\"card_id\":\"peMVT0YHODc5JbTPi-9HPlEHJzPo\",\"code\":\"198374613512\",\"openid\":\"oeMVT0c8Lp01LFBMcBof9T62bAt4\",\"is_unique_code\":false,\"outer_str\":\"12b\"}}}";
         NetWorkHelper netWorkHelper = new NetWorkHelper();
-        netWorkHelper.connectWeiXinInterface(actionUrl,json);
+        netWorkHelper.connectWeiXinInterface(actionUrl,json4);
     }
 
     /**
@@ -633,8 +635,9 @@ public class Test {
     @RequestMapping(value = "getqrcode", method = RequestMethod.GET)
     public void getqrcode(){
         String url = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQGv8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyNWFYY1JEVTVkamgxRWRxZk5yY28AAgSNX4ZbAwSAOgkA";
+        String u = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQHX8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyYkRXRlFwVTVkamgxb18zRXh0NHIAAgS-T4dbAwSAM_EB";
         NetWorkHelper netWorkHelper = new NetWorkHelper();
-        String get = netWorkHelper.getHttpsResponse(url, "GET");
+        String get = netWorkHelper.getHttpsResponse(u, "GET");
         System.out.println(get);
     }
     /**
@@ -767,5 +770,124 @@ public class Test {
         netWorkHelper.connectWeiXinInterface(url1,json);
         netWorkHelper.connectWeiXinInterface(url2,json2);
     }
+
+    /**
+     * 卡片信息的测试
+     * token（13_otgoDhw7ZQr3hGULb4Q2tLjUENgt29KZIh6Y2eX9ve6FHdGRMsKVBBpL3HcBMRR94KyoTDSBf1twU8c9VJyux4xFHNg6T_hA51Vhqhs-vIXl1Md29woA2AsEozwPJJjABAUOO）
+     *
+     *  peMVT0YHODc5JbTPi-9HPlEHJzPo card_id
+     *
+     * http://mmbiz.qpic.cn/mmbiz_jpg/33sVW2ZqdUZyUR7ALhCUrLXoI1s8oka0ic1Rjy06b6oRfc7a4maQ9yTzYqDbawTWa9RTuhcficcaiatibmnnW5ClKQ/0
+     *
+     * 卡县的销毁，先调用接口：HTTP请求方式: POST
+     * URL:https://api.weixin.qq.com/card/code/get?access_token=TOKEN 这边会返回一个code
+     *  销毁接口
+     * HTTP请求方式: POST
+     * URL:https://api.weixin.qq.com/card/code/consume?access_token=TOKEN
+     *
+     *
+     *
+     * HTTP请求方式: POSTURL: https://api.weixin.qq.com/card/create?access_token=ACCESS_TOKEN
+     */
+
+
+    /***
+     * 可以生成card_id
+     */
+    @RequestMapping(value = "getCard", method = RequestMethod.POST)
+    public void getCard(){
+        String token = token();
+        String url1 = String.format("https://api.weixin.qq.com/card/create?access_token=%s",token);
+         String json = "{\"card\":{\"card_type\":\"GROUPON\",\"groupon\":{\"base_info\":{\"logo_url\":\"http://mmbiz.qpic.cn/mmbiz/iaL1LJM1mF9aRKPZJkmG8xXhiaHqkKSVMMWeN3hLut7X7hicFNjakmxibMLGWpXrEXB33367o7zHN0CwngnQY7zb7g/0\",\"brand_name\":\"微信餐厅\",\"code_type\":\"CODE_TYPE_TEXT\",\"title\":\"132元双人火锅套餐\",\"color\":\"Color010\",\"notice\":\"使用时向服务员出示此券\",\"service_phone\":\"020-88888888\",\"description\":\"不可与其他优惠同享\\n如需团购券发票，请在消费时向商户提出\\n店内均可使用，仅限堂食\",\"date_info\":{\"type\":\"DATE_TYPE_FIX_TIME_RANGE\",\"begin_timestamp\":1397577600,\"end_timestamp\":1535599958214},\"sku\":{\"quantity\":500000},\"use_limit\":100,\"get_limit\":3,\"use_custom_code\":false,\"bind_openid\":false,\"can_share\":true,\"can_give_friend\":true,\"location_id_list\":[123,12321,345345],\"center_title\":\"顶部居中按钮\",\"center_sub_title\":\"按钮下方的wording\",\"center_url\":\"www.qq.com\",\"custom_url_name\":\"立即使用\",\"custom_url\":\"http://www.qq.com\",\"custom_url_sub_title\":\"6个汉字tips\",\"promotion_url_name\":\"更多优惠\",\"promotion_url\":\"http://www.qq.com\",\"source\":\"大众点评\"},\"advanced_info\":{\"use_condition\":{\"accept_category\":\"鞋类\",\"reject_category\":\"阿迪达斯\",\"can_use_with_other_discount\":true},\"abstract\":{\"abstract\":\"微信餐厅推出多种新季菜品，期待您的光临\",\"icon_url_list\":[\"http://mmbiz.qpic.cn/mmbiz_jpg/33sVW2ZqdUZyUR7ALhCUrLXoI1s8oka0ic1Rjy06b6oRfc7a4maQ9yTzYqDbawTWa9RTuhcficcaiatibmnnW5ClKQ/0\"]},\"text_image_list\":[{\"image_url\":\"http://mmbiz.qpic.cn/mmbiz_jpg/33sVW2ZqdUZyUR7ALhCUrLXoI1s8oka0ic1Rjy06b6oRfc7a4maQ9yTzYqDbawTWa9RTuhcficcaiatibmnnW5ClKQ/0\",\"text\":\"此菜品精选食材，以独特的烹饪方法，最大程度地刺激食 客的味蕾\"},{\"image_url\":\"http://mmbiz.qpic.cn/mmbiz_jpg/33sVW2ZqdUZyUR7ALhCUrLXoI1s8oka0ic1Rjy06b6oRfc7a4maQ9yTzYqDbawTWa9RTuhcficcaiatibmnnW5ClKQ/0\",\"text\":\"此菜品迎合大众口味，老少皆宜，营养均衡\"}],\"time_limit\":[{\"type\":\"MONDAY\",\"begin_hour\":0,\"end_hour\":10,\"begin_minute\":10,\"end_minute\":59},{\"type\":\"HOLIDAY\"}],\"business_service\":[\"BIZ_SERVICE_FREE_WIFI\",\"BIZ_SERVICE_WITH_PET\",\"BIZ_SERVICE_FREE_PARK\",\"BIZ_SERVICE_DELIVER\"]},\"deal_detail\":\"以下锅底2选1（有菌王锅、麻辣锅、大骨锅、番茄锅、清补 凉锅、酸菜鱼锅可选）：\\n大锅1份 12元\\n小锅2份 16元 \"}}}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url1,json);
+
+    }
+
+
+    /**
+     * 创建微信门店
+     * 	http://api.weixin.qq.com/cgi-bin/poi/addpoi?access_token=TOKEN
+     * 	json POST
+     *
+     * 	测试账号没有授权
+     * 	生成了card_id
+     */
+    @RequestMapping(value = "setMendian", method = RequestMethod.POST)
+    public void setMendian(){
+        String token = token();
+        String url1 = String.format("https://api.weixin.qq.com/cgi-bin/poi/addpoi?access_token=%s",token);
+        String json = "{\"card\":{\"card_type\":\"GROUPON\",\"groupon\":{\"base_info\":{\"logo_url\":\"http://mmbiz.qpic.cn/mmbiz/iaL1LJM1mF9aRKPZJkmG8xXhiaHqkKSVMMWeN3hLut7X7hicFNjakmxibMLGWpXrEXB33367o7zHN0CwngnQY7zb7g/0\",\"brand_name\":\"微信餐厅\",\"code_type\":\"CODE_TYPE_TEXT\",\"title\":\"132元双人火锅套餐\",\"color\":\"Color010\",\"notice\":\"使用时向服务员出示此券\",\"service_phone\":\"020-88888888\",\"description\":\"不可与其他优惠同享\\n如需团购券发票，请在消费时向商户提出\\n店内均可使用，仅限堂食\",\"date_info\":{\"type\":\"DATE_TYPE_FIX_TIME_RANGE\",\"begin_timestamp\":1397577600,\"end_timestamp\":1535599958214},\"sku\":{\"quantity\":500000},\"use_limit\":100,\"get_limit\":3,\"use_custom_code\":false,\"bind_openid\":false,\"can_share\":true,\"can_give_friend\":true,\"location_id_list\":[123,12321,345345],\"center_title\":\"顶部居中按钮\",\"center_sub_title\":\"按钮下方的wording\",\"center_url\":\"www.qq.com\",\"custom_url_name\":\"立即使用\",\"custom_url\":\"http://www.qq.com\",\"custom_url_sub_title\":\"6个汉字tips\",\"promotion_url_name\":\"更多优惠\",\"promotion_url\":\"http://www.qq.com\",\"source\":\"大众点评\"},\"advanced_info\":{\"use_condition\":{\"accept_category\":\"鞋类\",\"reject_category\":\"阿迪达斯\",\"can_use_with_other_discount\":true},\"abstract\":{\"abstract\":\"微信餐厅推出多种新季菜品，期待您的光临\",\"icon_url_list\":[\"http://mmbiz.qpic.cn/mmbiz_jpg/33sVW2ZqdUZyUR7ALhCUrLXoI1s8oka0ic1Rjy06b6oRfc7a4maQ9yTzYqDbawTWa9RTuhcficcaiatibmnnW5ClKQ/0\"]},\"text_image_list\":[{\"image_url\":\"http://mmbiz.qpic.cn/mmbiz_jpg/33sVW2ZqdUZyUR7ALhCUrLXoI1s8oka0ic1Rjy06b6oRfc7a4maQ9yTzYqDbawTWa9RTuhcficcaiatibmnnW5ClKQ/0\",\"text\":\"此菜品精选食材，以独特的烹饪方法，最大程度地刺激食 客的味蕾\"},{\"image_url\":\"http://mmbiz.qpic.cn/mmbiz_jpg/33sVW2ZqdUZyUR7ALhCUrLXoI1s8oka0ic1Rjy06b6oRfc7a4maQ9yTzYqDbawTWa9RTuhcficcaiatibmnnW5ClKQ/0\",\"text\":\"此菜品迎合大众口味，老少皆宜，营养均衡\"}],\"time_limit\":[{\"type\":\"MONDAY\",\"begin_hour\":0,\"end_hour\":10,\"begin_minute\":10,\"end_minute\":59},{\"type\":\"HOLIDAY\"}],\"business_service\":[\"BIZ_SERVICE_FREE_WIFI\",\"BIZ_SERVICE_WITH_PET\",\"BIZ_SERVICE_FREE_PARK\",\"BIZ_SERVICE_DELIVER\"]},\"deal_detail\":\"以下锅底2选1（有菌王锅、麻辣锅、大骨锅、番茄锅、清补 凉锅、酸菜鱼锅可选）：\\n大锅1份 12元\\n小锅2份 16元 \"}}}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url1,json);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(stampToDate(String.valueOf(System.currentTimeMillis())));
+        System.out.println(System.currentTimeMillis());
+    }
+
+    /*
+     * 将时间戳转换为时间
+     */
+    public static String stampToDate(String s){
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long lt = new Long(s);
+        Date date = new Date(lt);
+        res = simpleDateFormat.format(date);
+        return res;
+    }
+    /*
+
+     * 将时间转换为时间戳
+     */
+    public static String dateToStamp(String s) throws ParseException {
+        String res;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = simpleDateFormat.parse(s);
+        long ts = date.getTime();
+        res = String.valueOf(ts);
+        return res;
+    }
+
+    /**
+     * 设置买单权限
+     * HTTP请求方式: POSTURL:https://api.weixin.qq.com/card/paycell/set?access_token=TOKEN
+     *
+     * 携带参数 {  “card_id”:“ph_gmt7cUVrlRk8swPwx7aDyF-pg“,  “is_open”: true}
+     *
+     *
+     * 接口调用请求说明
+     *
+     * HTTP请求方式: POSTURL:https://api.weixin.qq.com/card/selfconsumecell/set?access_token=TOKEN
+     * POST数据
+     *
+     * {  “card_id”:“ph_gmt7cUVrlRk8swPwx7aDyF-pg“,  “is_open”: true}
+     */
+    @RequestMapping(value = "setPayPermission", method = RequestMethod.POST)
+    public void setPayPermission(){
+        String token = token();
+        String url1 = String.format("https://api.weixin.qq.com/card/paycell/set?access_token=%s",token);
+        String json2 = "{\"card_id\":\"peMVT0SXtzD_MdeHJ72yQ-l8c0v4\",\"is_open\":false}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url1,json2);
+    }
+
+    /**
+     * 创建货架
+     * HTTP请求方式: POST
+     * URL:https://api.weixin.qq.com/card/landingpage/create?access_token=$TOKEN
+     *
+     */
+    @RequestMapping(value = "setShelfInterface", method = RequestMethod.POST)
+    public void setShelfInterface(){
+        String token = token();
+        String url1 = String.format("https://api.weixin.qq.com/card/landingpage/create?access_token=%s",token);
+        String json2 = "{\"banner\":\"http://mmbiz.qpic.cn/mmbiz_jpg/lm4ic5ic5ma8vHqic1FN8HUPvFxfYQCptOrg3daWiaBg3R6u6ne9Pnm0qicuDZKNhIyauNWOhyibXm5vPOajjsib4JV0g/0\",\"page_title\":\"惠城优惠大派送\",\"can_share\":true,\"scene\":\"SCENE_NEAR_BY\",\"card_list\":[{\"card_id\":\"peMVT0WcRBCmDWEAHCV7fYd_00Po\",\"thumb_url\":\"http://p18.qhimg.com/bdr/__85/d/_open360/meinv130/ABC26cbd.jpg\"},{\"card_id\":\"peMVT0fhUqD7PHttfrlhCaN_fmjo\",\"thumb_url\":\"http://p18.qhimg.com/bdr/__85/d/_open360/meinv130/ABC26cbd.jpg\"}]}";
+        NetWorkHelper netWorkHelper = new NetWorkHelper();
+        netWorkHelper.connectWeiXinInterface(url1,json2);
+    }
+
 
 }

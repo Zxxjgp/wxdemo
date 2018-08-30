@@ -123,7 +123,7 @@ public class MessageHandlerUtil {
                 break;
             case "图片":
                 //通过素材管理接口上传图片时得到的media_id
-                String imgMediaId = "6Z6_2lZZdQtdF8IqCw9VFCZOV_I-WCdUCKG98pixdqas2ORFoYPUP0bR5B9VBWNk";
+                String imgMediaId = "SECf3Uu6R-Pvk1IUaDXfbE3Ljgy-rSrNsaC204fYVngDoi9d1wUw7cPvxlYJPjZR";
                 responseMessage = buildImageMessage(map, imgMediaId);
                 break;
             case "语音":
