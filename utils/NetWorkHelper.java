@@ -72,6 +72,7 @@ public class NetWorkHelper {
 
      */
 
+
     public  void connectWeiXinInterface(String action,String json){
 
         URL url;
