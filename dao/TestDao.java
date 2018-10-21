@@ -18,13 +18,18 @@ import java.util.Random;
  * @UpdateRemark: 更新说明
  * @Version: 1.0
  */
+@Mapper
 public interface TestDao {
+    /**
+     *
+     * @return
+     */
     List<Test> list();
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         String str ="f96e2e494b1a41f4852d7c4e6f0608d2";
         System.out.println(str.length());
 
 
-    }
+    }*/
 
 }

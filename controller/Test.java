@@ -1,12 +1,10 @@
 package com.wx.ioc.wxdemo.controller;
 
-import com.wx.ioc.wxdemo.common.MessageType;
 import com.wx.ioc.wxdemo.entity.AccessToken;
 import com.wx.ioc.wxdemo.service.AccessTokens;
 import com.wx.ioc.wxdemo.utils.MessageHandlerUtil;
 import com.wx.ioc.wxdemo.utils.NetWorkHelper;
-import org.hibernate.validator.constraints.pl.REGON;
-import org.springframework.scheduling.annotation.Scheduled;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -14,14 +12,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.wx.ioc.wxdemo.utils.MessageHandlerUtil.buildTextMessage;
 
 /**
  * @ProjectName: wxdemo
